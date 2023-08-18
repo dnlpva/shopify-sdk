@@ -77,6 +77,7 @@ import com.shopify.model.ShopifyImageRoot;
 import com.shopify.model.ShopifyInventoryLevel;
 import com.shopify.model.ShopifyInventoryLevelRoot;
 import com.shopify.model.ShopifyLocation;
+import com.shopify.model.ShopifyLocationRoot;
 import com.shopify.model.ShopifyLocationsRoot;
 import com.shopify.model.ShopifyOrder;
 import com.shopify.model.ShopifyOrderCreationRequest;
@@ -903,6 +904,19 @@ public class ShopifySdk {
 		return shopifyLocationRootResponse.getLocations();
 	}
 
+	public ShopifyLocation getLocation(final String locationId) {
+		final String locationEndpoint = new StringBuilder().append(LOCATIONS).append("/").append(locationId).append(JSON).toString();
+		final Response response = get(getWebTarget().path(locationEndpoint));
+		final ShopifyLocationRoot shopifyLocationRootResponse = response.readEntity(ShopifyLocationRoot.class);
+		return shopifyLocationRootResponse.getLocation();
+	}
+
+	public List<Metafield> getLocationMetafields(final String locationId) {
+		final Response response = get(buildLocationsEndpoint().path(locationId).path(METAFIELDS));
+		final MetafieldsRoot metafieldsRootResponse = response.readEntity(MetafieldsRoot.class);
+		return metafieldsRootResponse.getMetafields();
+	}
+
 	public ShopifyInventoryLevel updateInventoryLevel(final String inventoryItemId, final String locationId,
 			final long quantity) {
 		final ShopifyInventoryLevel shopifyInventoryLevel = new ShopifyInventoryLevel();
@@ -1215,6 +1229,10 @@ public class ShopifySdk {
 
 	private WebTarget buildOrdersEndpoint() {
 		return getWebTarget().path(ORDERS);
+	}
+
+	private WebTarget buildLocationsEndpoint() {
+		return getWebTarget().path(LOCATIONS);
 	}
 
 	public List<ShopifyFulfillmentOrder> getFulfillmentOrdersFromOrder(final String shopifyOrderId) {

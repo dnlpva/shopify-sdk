@@ -1,10 +1,7 @@
 package com.shopify;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -449,6 +446,16 @@ public class ShopifySdk {
 		final Response response = get(getWebTarget().path(PRODUCTS).path(productId));
 		final ShopifyProductRoot shopifyProductRootResponse = response.readEntity(ShopifyProductRoot.class);
 		return shopifyProductRootResponse.getProduct();
+	}
+
+	public List<ShopifyProduct> searchProducts(final Map<String, String> queryParams) {
+		WebTarget webTarget = getWebTarget().path(PRODUCTS);
+		for (String param: queryParams.keySet()) {
+			webTarget = webTarget.queryParam(param, queryParams.get(param));
+		}
+		final Response response = get(webTarget);
+		final ShopifyProductsRoot shopifyProductRootResponse = response.readEntity(ShopifyProductsRoot.class);
+		return shopifyProductRootResponse.getProducts();
 	}
 
 	public ShopifyVariant getVariant(final String variantId) {
@@ -905,6 +912,7 @@ public class ShopifySdk {
 	}
 
 	public ShopifyLocation getLocation(final String locationId) {
+		System.out.println("Getting location");
 		final String locationEndpoint = new StringBuilder().append(LOCATIONS).append("/").append(locationId).append(JSON).toString();
 		final Response response = get(getWebTarget().path(locationEndpoint));
 		final ShopifyLocationRoot shopifyLocationRootResponse = response.readEntity(ShopifyLocationRoot.class);
